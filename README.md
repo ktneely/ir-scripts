@@ -1,7 +1,6 @@
 ir-scripts
 ==========
-
-Random scripts for log mining, intel gathering, network querying, and other incident response-ish activities
+Random scripts for log mining, intel gathering, network querying, and other incident response-ish activities.  Unless otherwise indicated, all files in this project are governed by the GPLv3 license.  For reference, you should have received a LICENSE file when cloning this repository.
 
 ioc-intel.sh
 ------------
