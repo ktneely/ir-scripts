@@ -1,16 +1,46 @@
-ir-scripts
-==========
-Random scripts for log mining, intel gathering, network querying, and other incident response-ish activities.  Unless otherwise indicated, all files in this project are governed by the GPLv3 license.  For reference, you should have received a LICENSE file when cloning this repository.
+#+TITLE: Incident Management and Response Tools
 
-ioc-intel.sh
-------------
-This script performs some quick lookups against a list of ip address or FQDN IOCs
+* Overview
+  This repository is a set of scripts I have created and use for performing incident management activities.  To me, this covers everything from vulnerability analysis to open source research to incident response activities, and as a result, this is a pretty varied toolset.
 
-reverselook.sh
--------------
-performs reverse lookups on a list of IP addresses
+However, this is fairly tailored to my own workflows and tools, so you
+may not be able to run it directly out-of-the-box.  I hope these are
+of some use.
 
-cif-lookup.sh
--------------
-performs lookups on multiple cif servers and reports on hit or no hit
-cif servers are based on local user's .cif* files
+** Preparing your envionment
+   Most things can be run straight away or with slight modification to the code itself.  However, some of the scripts ahve configuration settings and they default to looking in ~/.incmgmt for relevant configuration files
+
+
+* The Scripts
+  The scripts and toolsin this repository are organized into folders by use or purpose.  
+
+** Vulnerability Analysis and Management
+   Located in ./VulnMgmt
+   Scripts to help implement a vulnerability management program
+
+*** Vuln-tickets.py
+    This creates tickets on both Redmine[fn:1] and Service Now[fn:2] ticketing systems so that operational teams can work on the issues.
+
+** Research
+   Located in ./Research
+  Random scripts for log mining, intel gathering, network querying,
+  and other incident response-ish activities.  Unless otherwise
+  indicated, all files in this project are governed by the GPLv3
+  license.  
+*** ioc-intel.sh
+    This script performs some quick lookups against a list of ip
+    address or FQDN IOCs
+*** reverselook.sh
+    performs reverse lookups on a list of IP addresses
+*** cif-lookup.sh
+    performs lookups on multiple cif servers and reports on hit or no
+hit cif servers are based on local user's .cif* files
+
+* License
+  See the LICENSE file in this repository for the license of everything it contains
+
+* Footnotes
+
+[fn:1] [[https://www.redmine.org][Redmine]] is a Project management tool and the script uses the [[https://pypi.python.org/pypi/python-redmine/0.4.0][python-redmine library]]
+
+[fn:2] http://wiki.servicenow.com/index.php?title=Table_API_Python_Examples
