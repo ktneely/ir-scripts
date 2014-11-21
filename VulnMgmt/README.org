@@ -1,0 +1,8 @@
+#+TITLE: Description of the tools in this directory
+
+* Vuln-tickets.py
+** General working of the script
+   This is an ugly script, so just bear with me on this.  In my environment, I have a need to create ticket for identified vulnerabilies on two different systems.  The Redmine is for tracking as well as change control, so it gets more information, and the Service Now is for the operational teams to perform the work. 
+** Redmine specifics
+** ServiceNow specifics
+   In my implementation, we have a high-level category for vulnerability management, and then subcategories for the type of system identified with the vulnerabilty.  As such, the Vulnerability Management category is hard-coded in the script
