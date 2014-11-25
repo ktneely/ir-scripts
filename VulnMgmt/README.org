@@ -1,8 +1,32 @@
 #+TITLE: Description of the tools in this directory
 
+* General Information
+
+** Preferences File
+   The scripts use a preferences file to store site-specific information such as server and user parameters.
+
+** TODO General workflow
+   For the scripts in this repository to make sense, I believe it would be helpful to provide a description of my workflow for vulnerability analysis and management.  However, that will have to wait a bit before I can type all that out.  :-/
+
+*** TODO use a "real" preferences file
+    The current preferences file is a simple text file that is very sensitive to parameters being on the correct line.  This needs to be changed into a key:value pairing style of preferences that are read and used across the various scripts.
+
 * Vuln-tickets.py
 ** General working of the script
    This is an ugly script, so just bear with me on this.  In my environment, I have a need to create ticket for identified vulnerabilies on two different systems.  The Redmine is for tracking as well as change control, so it gets more information, and the Service Now is for the operational teams to perform the work. 
+
+   The script will create tickets for all issues in the exported report that are scored at or above the CVSS score specified on line 7 of the preferences file.   To avoid creating duplicate tickets for the same issue, teh analyst can create overrides in OpenVAS to adjust the resultant CVSS scoring or "hide" the detections for a temporary time duration.  The script checks for the existence of the "new_severity" tag in the XML report, which is created if the identification has been adjusted through the use of an override.
+
 ** Redmine specifics
 ** ServiceNow specifics
    In my implementation, we have a high-level category for vulnerability management, and then subcategories for the type of system identified with the vulnerabilty.  As such, the Vulnerability Management category is hard-coded in the script
+* TODO ov_host-metrics.py
+  This script analyzes a directory of exported XML reports from OpenVAS tasks and extracts data relevant to perform some metrics analysis.
+
+  Also, because the Vuln-tickets.py script is "live" and creates work tickets on production systems, I use this to perform a quick sanity check on a report prior to creating the tickets.
+
+
+* TODO redmine_collect-issues.py
+  Queries a redmine server for issues created in a specific project and generates some basic data around those tickets for analysis.
+* TODO reconcile_tickets.py
+  Since I am in the unenviable position of having to support multiple ticketing systems, this script checks the status of the ticket in the system most used by the operational teams and closes it in the security tracking system if it has been marked complete in the other system.
