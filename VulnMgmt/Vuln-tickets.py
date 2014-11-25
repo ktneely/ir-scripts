@@ -155,7 +155,11 @@ def log(redmine_issue_id, sn_ticket, sys_id, redmine_url):
 # Extract elements from the XML
 for result in root.findall("./report/results/result"):
     # only process vulnerabilities of a certain severity or higher
-    if float(result.find('nvt/cvss_base').text) > float(severity_filter):
+    if result.find('overrides/override/new_severity') is not None:
+        cvss = result.find('overrides/override/new_severity').text
+    else:
+        cvss = result.find('nvt/cvss_base').text
+    if float(cvss) >= float(severity_filter):
         # Extract the elements from the XML
         host_ip = result.find('host').text
         severity = result.find('severity').text
