@@ -158,7 +158,7 @@ for result in root.findall("./report/results/result"):
     if result.find('overrides/override/new_severity') is not None:
         cvss = result.find('overrides/override/new_severity').text
     else:
-        cvss = result.find('nvt/cvss_base').text
+        cvss = result.find('severity').text
     if float(cvss) >= float(severity_filter):
         # Extract the elements from the XML
         host_ip = result.find('host').text
@@ -174,7 +174,7 @@ for result in root.findall("./report/results/result"):
         full_desc = result.find('nvt/tags').text
         criticality(cvss)    # calc criticality levels
         subject = short_desc + " detected on " + hostname + " " + host_ip
-        body = preamble + "\n \n" + full_desc
+        body = preamble + "\n \n" + full_desc + "\n \n CVEs:" + cve
         # create the issues in redmine and return info
         redmine_url, redmine_issue_id = redmine_issue(priority, \
             subject, body, category)
