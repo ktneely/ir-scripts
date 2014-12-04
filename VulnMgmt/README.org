@@ -1,10 +1,45 @@
 #+TITLE: Description of the tools in this directory
 
+* Requirements
+  You will need to have the following modules installed:
+
+** Python
+   The scripts are being converted from 2.7 to 3.x (tested on 3.4), so you will need to have both installed
+
+** Python modules
+   - python-redmine
+   - json
+   - socket
+
 * General Information
 
 ** Preferences File
    The scripts use a preferences file to store site-specific information such as server and user parameters.
 
+*** Format
+## Configure your environment through preferences file
+# load prefs from ~/.incmgmt/prefs.txt
+# The parameters should be in the following format
+# DO NOT use comments or blank lines.
+# Redmine Project
+# Redmine URL
+# Redmine API key
+# ServiceNow URL
+# ServiceNow username
+# Servicenow password
+# severity level
+# OpenVAS XML report file
+# Preamble: general info you want included in every ticket created
+
+
+*** TODO Make the prefs file a "real" Config file
+    Use Configparser to handle a "real" preferences file
+    https://docs.python.org/3.4/library/configparser.html
+
+
+** Other files
+   - ticketlog.csv:  A log of all tickets created in both systems
+   - opentix.csv: A log of active (read: open) tickets. Generated from ticketlog.csv if it does not already exist
 ** TODO General workflow
    For the scripts in this repository to make sense, I believe it would be helpful to provide a description of my workflow for vulnerability analysis and management.  However, that will have to wait a bit before I can type all that out.  :-/
 
@@ -30,3 +65,12 @@
   Queries a redmine server for issues created in a specific project and generates some basic data around those tickets for analysis.
 * TODO reconcile_tickets.py
   Since I am in the unenviable position of having to support multiple ticketing systems, this script checks the status of the ticket in the system most used by the operational teams and closes it in the security tracking system if it has been marked complete in the other system.
+** Getting Started
+   This script relies upon the 'ticketlog.csv' file that is placed in your ~/.incmgmt directory when running Vuln-tickets.py.  Before running the first time, make a copy of ticketlog.csv to opentix.csv with the following command:
+
+  cp ~/.incmgmt/ticketlog.csv ~/.incmgmt/opentix.csv
+
+To preserve processing time, the script will destroy opentix.csv each time the script is run and then recreate it with only tickets that remain open in Service Now.  Do not worry if this gets lost, as it can always be re-created by copying ticketlog.csv.  The first time it runs, however, will be longer as the script eliminates the closed tickets from the open list.
+
+In the future, the script will create this file automatically.   If it does not find opentix.csv, it will create the file based on information pulled from ticketlog.csv.  (if it can't find that, it will error out.  I can't do everything for you!)  This file is a subset of ticketlog. 
+
