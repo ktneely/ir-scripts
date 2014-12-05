@@ -9,8 +9,8 @@ import glob
 import socket
 import xml.etree.ElementTree as ET
 
-data_dir = 'Directory where Data exists'
-
+#data_dir = 'Directory where Data exists'
+data_dir = '/media/sf_Aruba/InfoSec/Metrics/Data/OpenVAS'
 severity_filter = 6 # arbitrary filter to limit the data
 # Read the reports
 os.chdir(data_dir)

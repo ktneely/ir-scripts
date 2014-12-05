@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+# This script checks the status of the tickets in Redmine and
+# ServiceNow, closing the Redmine ticket if the ServiceNow ticket has
+# been fully closed.
+# Version 0.5
 
 #modules
 import requests
@@ -104,10 +108,9 @@ def CheckRMStatus(rm_ticket, sn_ticket, sys_id):
         return None
         
 def UpdateRedmineTicket(ticket):
-    return None  #DEBUG
-#    redmine.issue.update(ticket, status_id = 5, \
-#            notes = "Issue marked complete in Service Now")
-#    return None
+    redmine.issue.update(ticket, status_id = 5, \
+            notes = "Issue marked complete in Service Now")
+    return None
 
 
 # Main    
