@@ -1,6 +1,7 @@
 #+TITLE: Incident Management and Response Tools
 
 * Overview
+  I have a large number of systems, security, operations, and otherwise with some role in the incident management process.  They sit there, blinking lights at each other, but none of them communicate.  The scripts in this directory aim to fix that, likely in the most superficial way possible.
   This repository is a set of scripts I have created and use for performing incident management activities.  To me, this covers everything from vulnerability analysis to open source research to incident response activities, and as a result, this is a pretty varied toolset.
 
 However, this is fairly tailored to my own workflows and tools, so you
