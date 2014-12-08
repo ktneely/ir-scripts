@@ -118,7 +118,7 @@ def redmine_issue(priority, subject, body, category):
         tracker_id=19, category_id = category)
     redmine_issue_id = str(new_issue.id)
     redmine_url = redmine_server + "/issues/" + redmine_issue_id
-    print "redmine ticket created"
+    print("redmine ticket created")
     return redmine_url, redmine_issue_id
 
 def sn_issue(subject, redmine_url, subcategory, impact, urgency):
@@ -140,16 +140,20 @@ def sn_issue(subject, redmine_url, subcategory, impact, urgency):
     # Capture the ticket number and unique identifier
     sn_ticket = response.json()['result']['number']
     sys_id = response.json()['result']['sys_id']
-    print "service now ticket created"
+    print("service now ticket created")
     return sn_ticket, sys_id
 
  
 def log(redmine_issue_id, sn_ticket, sys_id, redmine_url):
     # Write log file of tickets created
     ticket_log = open('ticketlog.csv','a')
+    opentix_log = open('opentix.csv','a')
     ticket_log.write(redmine_issue_id + ',' + sn_ticket + ',' + \
         sys_id + ',' + redmine_url + ',' + '\n')
+    opentix_log.write(redmine_issue_id + ',' + sn_ticket + ',' + \
+        sys_id + '\n')
     ticket_log.close()
+    opentix_log.close()
 
 ## Main program.  Extract the data, then call functions
 # Extract elements from the XML
