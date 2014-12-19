@@ -75,7 +75,7 @@ def CheckSNStatus(rm_ticket, sn_ticket, sys_id):
     sn_url = sn_server + '/' + sys_id
     incident = requests.get(sn_url, auth=(user, pwd), \
                 headers = headers)
-    if incident.status_code != 200: 
+    if incident.status_code != 200:   # error handling for bad response
         print('Status:', incident.status_code, 'Headers:', incident.headers, 'Error Response:',incident.json())
         print("Error in retrieving ServiceNow ticket.  See above")
         exit()
@@ -99,7 +99,7 @@ def CheckRMStatus(rm_ticket, sn_ticket, sys_id):
     if str(status) != 'Closed':
         # Check the status of the ticket and close if still open
         print("The Redmine Ticket is still open. Closing now.")
-        UpdateRedmineTicket(rm_ticket)
+        UpdateRedmineTicket(rm_ticket, sn_ticket)
         print("Writing to opentix for a double-check next run")
         WriteActive(rm_ticket, sn_ticket, sys_id) 
         return None
@@ -107,9 +107,10 @@ def CheckRMStatus(rm_ticket, sn_ticket, sys_id):
         print("Ticket already closed in Redmine. Removing.")
         return None
         
-def UpdateRedmineTicket(ticket):
+def UpdateRedmineTicket(ticket, sn_ticket):
+    updatemsg = "ServiceNow ticket " + sn_ticket + " has been marked done"
     redmine.issue.update(ticket, status_id = 5, \
-            notes = "Issue marked complete in Service Now")
+     notes = updatemsg)
     return None
 
 
