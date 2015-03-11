@@ -10,6 +10,7 @@
 import requests
 import socket
 import os
+import csv
 import json
 from redmine import Redmine
 import xml.etree.ElementTree as ET
@@ -41,6 +42,10 @@ severity_filter = ov_prefs.next().rstrip()
 ov_report = ov_prefs.next().rstrip()
 preamble =  ov_prefs.next().rstrip()
 ov_prefs.close()
+
+# Define service now headers
+headers = {"Content-Type":"application/json","Accept":"application/json"}
+
 
 # Input the vulnerability report and parse the XML
 root = ET.parse(ov_report)
@@ -123,8 +128,6 @@ def redmine_issue(priority, subject, body, category):
 
 def sn_issue(subject, redmine_url, subcategory, impact, urgency):
     ## Create the incident in ServiceNow
-        # Create the headers
-    headers = {"Content-Type":"application/json","Accept":"application/json"}
     # Construct the incident JSON object
     incident_data = '{'  + \
         '"short_description":' + '"' + subject + '",' + \
@@ -143,6 +146,40 @@ def sn_issue(subject, redmine_url, subcategory, impact, urgency):
     print("service now ticket created")
     return sn_ticket, sys_id
 
+# Update the Service Now ticket with a comment
+def sn_update(sys_id, comment):
+    sn_url = sn_server + '/' + sys_id  # REST URL for the ticket
+    update = requests.patch(sn_url, auth=(user, pwd), headers=headers,\
+            data='{"comments":"' + comment +'"}')
+    if update.status_code != 200: 
+        print('Status:', response.status_code, 'Headers:',\
+               response.headers, 'Error Response:',response.json())
+        exit()
+    print("Updated Service Now ticket" + " " + sys_id)  # user output
+
+
+# checks for a ticket with the exact same "subject" or "short
+# description" on the Redmine system.
+def CheckTickets(subject):
+    i = 0
+    project = redmine.project.get(redmine_project)
+    while i < len(project.issues):
+#        print("Checking: " + str(project.issues[i]))
+        if str(project.issues[i]) == subject:
+            incident_id = project.issues[i].id
+            opentix_log = csv.reader(open('opentix.csv'))
+            # Generate a dictionary of the known open tickets.  This
+            # should really be performed at the beginning so it
+            # doesn't run everytime, but meh!
+            tix_dict = {}
+            for row in opentix_log:
+                tix_dict[row[0]]=row[2]
+            sn_sysid = tix_dict[str(incident_id)]
+            print("Found match: " + tix_dict[str(incident_id)] + " " + str(project.issues[i]))  # debug
+            return sn_sysid # return a value for test
+        i += 1
+    return None  # if the test fails, return nothing
+            
  
 def log(redmine_issue_id, sn_ticket, sys_id, redmine_url):
     # Write log file of tickets created
@@ -179,10 +216,17 @@ for result in root.findall("./report/results/result"):
         criticality(cvss)    # calc criticality levels
         subject = short_desc + " detected on " + hostname + " " + host_ip
         body = preamble + "\n \n" + full_desc + "\n \n CVEs:" + cve
-        # create the issues in redmine and return info
-        redmine_url, redmine_issue_id = redmine_issue(priority, \
-            subject, body, category)
-        # create the issues in ServiceNow and return info
-        sn_ticket, sys_id = sn_issue(subject, redmine_url, \
-            subcategory, impact, urgency)
-        log (redmine_issue_id, sn_ticket, sys_id, redmine_url)
+        # Check for currently active ticket for same issue.  This
+        previous = CheckTickets(subject)
+        # Create a new ticket if one does not exist.
+        if previous is not None:
+            sn_update(previous, "Please provide an update for this ticket")
+        else:
+            # create the issues in redmine and return info        
+            redmine_url, redmine_issue_id = redmine_issue(priority, \
+                subject, body, category)
+            # create the issues in ServiceNow and return info
+            sn_ticket, sys_id = sn_issue(subject, redmine_url, \
+                subcategory, impact, urgency)
+            log (redmine_issue_id, sn_ticket, sys_id, redmine_url)
+
