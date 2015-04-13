@@ -12,6 +12,22 @@ of some use.
    Most things can be run straight away or with slight modification to the code itself.  However, some of the scripts ahve configuration settings and they default to looking in ~/.incmgmt for relevant configuration files
 
 
+** TODO Methodology
+   In the future, I will separate the basic execution and script description documentation from the documentation around methodology.  But until I get this sorted, it will be mixed in with the rest of the documentation.  At the moment, it i merely disorganized snippets to remind me what I want to write about.
+
+*** Vulnerability Management
+
+**** Using Overrides
+
+**** Reporting
+     After a task has run, I perform a quick review of the results and edit out 
+
+*** Creating work tickets
+    Once the general report information is saved to my data storage, I go back to the report in the OpenVAS web interface and create some more, usually temporary, overrrides.  This is to prevent creating a number of duplicate tickets.  For example, if there is vulnerability in Apache, and the server is configured to listen on multiple ports such as 80 and 443, then OpenVAS will report two discrete vulnerabilities.  However, both of these will liklely be fixed at the same time by updating Apache.  And on a subnetwork devoted to web servers, there will likely be a large number of these duplicates.  So, I will create a temporary override for that particular task that ignores one of the two ports for all hosts on that task and modifying the detection to 'log', rather than a vuln.  The override duration should be just a bit longer than your scan cycle or expected remediation.
+    Another way to handle this would be to modify the script to create only a single ticket when the host and short description are the same. 
+
+
+
 * The Scripts
   The scripts and toolsin this repository are organized into folders by use or purpose.  
 
