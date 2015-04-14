@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # This takes an XML report extracted from an OpenVAS VA scanner and
 # creates issue tickets on ServiceNow and Redmine systems for tracking
@@ -32,15 +32,15 @@ import xml.etree.ElementTree as ET
 os.chdir(os.path.expanduser("~") + "/.incmgmt/")
 
 ov_prefs = open('ov_prefs.txt','r')
-redmine_project = ov_prefs.next().rstrip()
-redmine_server = ov_prefs.next().rstrip()
-redmine_key = ov_prefs.next().rstrip()
-sn_server = ov_prefs.next().rstrip()
-user = ov_prefs.next().rstrip()
-pwd = ov_prefs.next().rstrip()
-severity_filter = ov_prefs.next().rstrip()
-ov_report = ov_prefs.next().rstrip()
-preamble =  ov_prefs.next().rstrip()
+redmine_project = ov_prefs.readline().rstrip()
+redmine_server = ov_prefs.readline().rstrip()
+redmine_key = ov_prefs.readline().rstrip()
+sn_server = ov_prefs.readline().rstrip()
+user = ov_prefs.readline().rstrip()
+pwd = ov_prefs.readline().rstrip()
+severity_filter = ov_prefs.readline().rstrip()
+ov_report = ov_prefs.readline().rstrip()
+preamble =  ov_prefs.readline().rstrip()
 ov_prefs.close()
 
 # Define service now headers
@@ -193,7 +193,7 @@ def log(redmine_issue_id, sn_ticket, sys_id, redmine_url):
     opentix_log.close()
 
 ## Main program.  Extract the data, then call functions
-# Extract elements from the XML
+# Extract elements from the XML for use in creating the ticket
 for result in root.findall("./report/results/result"):
     # only process vulnerabilities of a certain severity or higher
     if result.find('overrides/override/new_severity') is not None:
@@ -204,6 +204,7 @@ for result in root.findall("./report/results/result"):
         # Extract the elements from the XML
         host_ip = result.find('host').text
         severity = result.find('severity').text
+        description = result.find('description').text
         short_desc = result.find('nvt/name').text
         cvss = result.find('nvt/cvss_base').text
         cve = result.find('nvt/cve').text
@@ -215,7 +216,10 @@ for result in root.findall("./report/results/result"):
         full_desc = result.find('nvt/tags').text
         criticality(cvss)    # calc criticality levels
         subject = short_desc + " detected on " + hostname + " " + host_ip
-        body = preamble + "\n \n" + full_desc + "\n \n CVEs:" + cve
+        # Create the body of the ticket by combining multiple elements from 
+        # the report file.
+        body = preamble + "\n \n" + full_desc + "\n \n CVEs:" + cve +\
+            "\n \n Description: \n" + description 
         # Check for currently active ticket for same issue.  This
         previous = CheckTickets(subject)
         # Create a new ticket if one does not exist.
