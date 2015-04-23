@@ -124,6 +124,6 @@ def ExtractFEAlerts(host, sys_type, data):
                 activity = "No Data"
             alert_url = data["alert"][i]["alertUrl"]
             time = data["alert"][i]["occurred"]
-            return dst, hostname, malware, severity, activity, \
-              time, alert_url
+            return dst, hostname, malware, severity, activity
+              # time, alert_url   # these are not useful atm
         i += 1

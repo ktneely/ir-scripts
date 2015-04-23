@@ -20,8 +20,9 @@ os.chdir(os.path.expanduser("~") + "/.incmgmt/")
 prefs = []
 for line in open('mw-prefs.txt'):
     prefs.append(line)
-user = prefs[9].rstrip()
-pwd = prefs[10].rstrip()
+rm_server = prefs[1].rstrip()  # redmine server URL
+user = prefs[9].rstrip()       # Fireeye API user
+pwd = prefs[10].rstrip()       # Fireee API password
 
 # Set the proper category. In my installation, #61 is "Malicious Code"
 category = 61  
@@ -31,23 +32,23 @@ print("Authenticating against the CMS as " + user)
 token = cmsauth(user, pwd)
 
 # retrieve alerts from the past hour
-data = cmsalerts(token, "24_hours")
+data = cmsalerts(token, "1_hour")
 
 index = genIndex("src", data)
 for host in index:
     print("\n \n processing: " + host)
-    dst, hostname, malware, severity, activity, time, alert_url = \
+    dst, hostname, malware, severity, activity = \
       ExtractFEAlerts(host, "src", data)
     print(host  + " was observed communicating with " + dst + " criticality:  " + severity + " And type: " + activity + " with malware: " + malware)
     old = tkt.CheckRMTickets("Malicious code activity detected on " + host)
     if old is not None:
         # If there is an active ticket, update it with new info
-        print("A Redmine ticket exists for this host " + old)
+        print("A Redmine ticket exists for this host: " + str(old))
     else:
         # If there is no existing ticket, create one
         print("No ticket exists, working to fix that\n")
         # construct the subject/short description
-        subject = "Malicious code activity detected on " + hos
+        subject = "Malicious code activity detected on " + host
         # determine criticality for ticketing systems based on sev
         impact, urgency, priority = tkt.criticality(severity)
         # construct the body of the ticket from the alert information
@@ -57,14 +58,16 @@ for host in index:
         * Affected Host: " + host + "\n" \
         "* Last identified hostname: " + hostname + " (please verify)\n" \
         "* Destination: " + dst + "\n" \
-        "* Malware family: [[" + malware + "]] \n" \ 
-        "* Activity Observed: " + activity + "\n" \
-        "* Detection Occurred at: " + time + "\n" \
-        "* FireEye alert URL: " + alert_url + "\n \n" # \
+        "* Malware family: [[" + malware + "]] \n" \
+        "* Activity Observed: " + activity + "\n" # \
+        # Time and alertUrl temp removed because they are not valuable
+        # working with FireEye support to make these usefule
+        #"* Detection Occurred at: " + time + "\n" \
+        #"* FireEye alert URL: " + alert_url + "\n \n" \
         # TODO:  add some OS-INT lookups into the ticket
         # "Open Source Intel: \n" + intel + "\n"
         rm_url, rm_issue = tkt.CreateRedmineTicket(subject, priority,\
-                body, category)
+                body, category, 18)   # 18 is the incident management tracker
         # URL for the Wiki page related to the detected malware family
         wikipage = rm_server + "/projects/incident_management/wiki/" \
           + malware.translate({ord(i):None for i in '.'})

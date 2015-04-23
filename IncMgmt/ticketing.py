@@ -49,7 +49,7 @@ def sn_issue(host, redmine_url, impact, urgency, wikipage):
         '"urgency":' + '"' + str(urgency)  + '",' + \
         '"contact_type":"Alert"' + '}' 
     # Create the incident on the Service Now system
-    response = requests.post(sn_server, auth=(user, pwd), \
+    response = requests.post(sn_server, auth=(sn_user, sn_pass), \
         headers=headers, data=incident_data)
     # Capture the ticket number and unique identifier
     if response.status_code != 201: 
@@ -75,12 +75,13 @@ def CheckRMTickets(short_desc):
     return None
 
             
-def CreateRedmineTicket(subject, priority, body, category):
-    new_issue = redmine.issue.create(project_id = redmine_project, \
-         subject = subject, tracker_id = tracker_id, priority_id = \
+def CreateRedmineTicket(subject, priority, body, category, tracker):
+    redmine, project = bindRedmine()
+    new_issue = redmine.issue.create(project_id = rm_project, \
+         subject = subject, tracker_id = tracker, priority_id = \
          priority, description = body, category_id = category)
     redmine_issue_id = str(new_issue.id)
-    redmine_url = redmine_server + "/issues/" + redmine_issue_id
+    redmine_url = rm_server + "/issues/" + redmine_issue_id
     print("Created ticket " + str(new_issue))
     return redmine_url, redmine_issue_id 
 
