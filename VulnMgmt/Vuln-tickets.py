@@ -204,7 +204,10 @@ for result in root.findall("./report/results/result"):
         # Extract the elements from the XML
         host_ip = result.find('host').text
         severity = result.find('severity').text
-        description = result.find('description').text
+        if result.find('description').text is not None:
+            description = result.find('description').text
+        else:
+            description = "no extended description available"
         short_desc = result.find('nvt/name').text
         cvss = result.find('nvt/cvss_base').text
         cve = result.find('nvt/cve').text
