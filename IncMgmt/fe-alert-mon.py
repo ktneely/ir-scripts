@@ -24,8 +24,9 @@ rm_server = prefs[1].rstrip()  # redmine server URL
 user = prefs[9].rstrip()       # Fireeye API user
 pwd = prefs[10].rstrip()       # Fireee API password
 
-# Set the proper category. In my installation, #61 is "Malicious Code"
-category = 61  
+# Set the proper redmine tracker and category for malware-related alerts. 
+category = 61  # In my installation, 61 is "Malicious Code"
+tracker = 18   # In my installation, 18 is the incident management tracker
 
 # retrieve an API token from the CMS
 print("Authenticating against the CMS as " + user)
@@ -40,19 +41,13 @@ for host in index:
     dst, hostname, malware, severity, activity = \
       ExtractFEAlerts(host, "src", data)
     print(host  + " was observed communicating with " + dst + " criticality:  " + severity + " And type: " + activity + " with malware: " + malware)
-    old = tkt.CheckRMTickets("Malicious code activity detected on " + host)
-    if old is not None:
-        # If there is an active ticket, update it with new info
-        print("A Redmine ticket exists for this host: " + str(old))
-    else:
-        # If there is no existing ticket, create one
-        print("No ticket exists, working to fix that\n")
-        # construct the subject/short description
-        subject = "Malicious code activity detected on " + host
-        # determine criticality for ticketing systems based on sev
-        impact, urgency, priority = tkt.criticality(severity)
-        # construct the body of the ticket from the alert information
-        body = "Information Security network monintoring devices \
+    # construct the subject/short description.  Do this even if a
+    # ticket is not going to be generated, because lazy
+    subject = "Malicious code activity detected on " + host
+    # determine criticality for ticketing systems based on sev
+    impact, urgency, priority = tkt.criticality(severity)
+    # construct the body of the ticket from the alert information
+    body = "Information Security network monintoring devices \
         have identified a potential compromise on the network. \n \
         Please check the following system for the following: \n \
         * Affected Host: " + host + "\n" \
@@ -60,17 +55,38 @@ for host in index:
         "* Destination: " + dst + "\n" \
         "* Malware family: [[" + malware + "]] \n" \
         "* Activity Observed: " + activity + "\n" # \
-        # Time and alertUrl temp removed because they are not valuable
-        # working with FireEye support to make these usefule
-        #"* Detection Occurred at: " + time + "\n" \
-        #"* FireEye alert URL: " + alert_url + "\n \n" \
-        # TODO:  add some OS-INT lookups into the ticket
-        # "Open Source Intel: \n" + intel + "\n"
+    # Time and alertUrl temp removed because they are not valuable
+    # working with FireEye support to make these usefule
+    #"* Detection Occurred at: " + time + "\n" \
+    #"* FireEye alert URL: " + alert_url + "\n \n" \
+    # TODO:  add some OS-INT lookups into the ticket
+    # "Open Source Intel: \n" + intel + "\n"
+
+    old = tkt.CheckRMTickets("Malicious code activity detected on " + host)
+    if old is not None:
+        # If there is an active ticket, update it with new info
+        print("A Redmine ticket exists for this host: " + str(old))
+        tkt.UpdateRedmineTicket(old, body)
+    elif (old is None and (severity == 'majr' )):
+        # If there is no existing ticket, create one
+        print("No ticket exists, generating tickets now\n")
         rm_url, rm_issue = tkt.CreateRedmineTicket(subject, priority,\
-                body, category, 18)   # 18 is the incident management tracker
+                body, category, tracker)   
         # URL for the Wiki page related to the detected malware family
         wikipage = rm_server + "/projects/incident_management/wiki/" \
           + malware.translate({ord(i):None for i in '.'})
         sn_ticket, sys_id = tkt.sn_issue(subject, rm_url, impact, \
                         urgency, wikipage)
         tkt.log(rm_issue, sn_ticket, sys_id)  # log the ticket info
+    elif (old is None and (severity == 'crit')):
+        # If there is no existing ticket, create one
+        print("No ticket exists, generating tickets now\n")
+        rm_url, rm_issue = tkt.CreateRedmineTicket(subject, priority,\
+                body, category, tracker)   
+        # URL for the Wiki page related to the detected malware family
+        wikipage = rm_server + "/projects/incident_management/wiki/" \
+          + malware.translate({ord(i):None for i in '.'})
+        sn_ticket, sys_id = tkt.sn_issue(subject, rm_url, impact, \
+                        urgency, wikipage)
+        tkt.log(rm_issue, sn_ticket, sys_id)  # log the ticket info
+    else: print("Alert severity below threshold")

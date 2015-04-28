@@ -28,6 +28,11 @@ ov_report = prefs.readline().rstrip()
 preamble =  prefs.readline().rstrip()
 prefs.close()
 
+# Turn off the SSL certificate warnings.  This is a less-than-stellar
+# idea.  TODO: implement using the certifi package to verify the SSL
+# certificate
+requests.packages.urllib3.disable_warnings()
+
 ## More prefs.  Man, I need to create a proper prefs file
 # identify the Redmine server parameters as an object
 redmine = Redmine(redmine_server, requests={'verify': False}, \
