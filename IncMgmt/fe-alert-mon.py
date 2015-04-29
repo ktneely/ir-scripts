@@ -67,7 +67,7 @@ for host in index:
         # If there is an active ticket, update it with new info
         print("A Redmine ticket exists for this host: " + str(old))
         tkt.UpdateRedmineTicket(old, body)
-    elif (old is None and (severity == 'majr' )):
+    elif (old is None and (severity.lower() == 'majr' )):
         # If there is no existing ticket, create one
         print("No ticket exists, generating tickets now\n")
         rm_url, rm_issue = tkt.CreateRedmineTicket(subject, priority,\
@@ -78,7 +78,7 @@ for host in index:
         sn_ticket, sys_id = tkt.sn_issue(subject, rm_url, impact, \
                         urgency, wikipage)
         tkt.log(rm_issue, sn_ticket, sys_id)  # log the ticket info
-    elif (old is None and (severity == 'crit')):
+    elif (old is None and (severity.lower() == 'crit')):
         # If there is no existing ticket, create one
         print("No ticket exists, generating tickets now\n")
         rm_url, rm_issue = tkt.CreateRedmineTicket(subject, priority,\

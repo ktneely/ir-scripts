@@ -111,11 +111,11 @@ def log(redmine_issue_id, sn_ticket, sys_id):
 # impact and urgency are used for Service Now
 # priority is used for Redmine
 def criticality(severity):
-    if severity == "crit":
+    if severity.lower() == "crit":
         impact = 2
         urgency = 1
         priority = 5
-    elif severity == "majr":
+    elif severity.lower() == "majr":
         impact = 2
         urgency = 2
         priority = 4
