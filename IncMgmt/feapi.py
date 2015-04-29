@@ -93,6 +93,7 @@ def genIndex(host, data):
 # TODO: extract ALL information if a particular host appears
 # more than once in the data
 def ExtractFEAlerts(host, sys_type, data):
+    import datetime as dt
     i = 0
     # iterate through the alerts to find the interesting host
     while i < len(data["alert"]):    
@@ -122,8 +123,12 @@ def ExtractFEAlerts(host, sys_type, data):
                 activity = "No Data"
             except KeyError:
                 activity = "No Data"
-            alert_url = data["alert"][i]["alertUrl"]
-            time = data["alert"][i]["occurred"]
-            return dst, hostname, malware, severity, activity
-              # time, alert_url   # these are not useful atm
+            alertUrl = data["alert"][i]["alertUrl"]
+            # Time extracted from the CMS is in miliseconds, so we
+            # need to divide by 1000 and then convert fromtimestamp.
+            # Finally, format the time in an easy-to-read way
+            alerttime = dt.datetime.fromtimestamp(data["alert"][i]["occurred"] / 1000)
+            time = alerttime.strftime('%Y-5m-%d %H:%M:%s')
+            return dst, hostname, malware, severity, activity, \
+                time, alertUrl  
         i += 1

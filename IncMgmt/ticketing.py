@@ -10,6 +10,11 @@ from redmine import Redmine
 # Set wd
 os.chdir(os.path.expanduser("~") + "/.incmgmt/")
 
+# Turn off the SSL certificate warnings.  This is a less-than-stellar
+# idea.  TODO: implement using the certifi package to verify the SSL
+# certificate
+requests.packages.urllib3.disable_warnings()
+
 # import ticketing system info and credentials from prefs file
 prefs = []
 for line in open('mw-prefs.txt'):

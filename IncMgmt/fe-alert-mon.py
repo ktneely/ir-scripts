@@ -9,7 +9,6 @@ from feapi import cmsalerts
 from feapi import genIndex
 from feapi import ExtractFEAlerts
 import ticketing as tkt
-#from ticketing import CheckRMTickets
 
 # Set wd
 os.chdir(os.path.expanduser("~") + "/.incmgmt/")
@@ -38,7 +37,7 @@ data = cmsalerts(token, "1_hour")
 index = genIndex("src", data)
 for host in index:
     print("\n \n processing: " + host)
-    dst, hostname, malware, severity, activity = \
+    dst, hostname, malware, severity, activity, time, alertUrl = \
       ExtractFEAlerts(host, "src", data)
     print(host  + " was observed communicating with " + dst + " criticality:  " + severity + " And type: " + activity + " with malware: " + malware)
     # construct the subject/short description.  Do this even if a
@@ -49,16 +48,14 @@ for host in index:
     # construct the body of the ticket from the alert information
     body = "Information Security network monintoring devices \
         have identified a potential compromise on the network. \n \
-        Please check the following system for the following: \n \
-        * Affected Host: " + host + "\n" \
+        Please check the following system for the following: \n"  \
+        "* Affected Host: " + host + "\n" \
         "* Last identified hostname: " + hostname + " (please verify)\n" \
         "* Destination: " + dst + "\n" \
         "* Malware family: [[" + malware + "]] \n" \
-        "* Activity Observed: " + activity + "\n" # \
-    # Time and alertUrl temp removed because they are not valuable
-    # working with FireEye support to make these usefule
-    #"* Detection Occurred at: " + time + "\n" \
-    #"* FireEye alert URL: " + alert_url + "\n \n" \
+        "* Activity Observed: " + activity + "\n"  \
+        "* Detection Occurred at: " + time + "\n" \
+        "* FireEye alert URL: " + alertUrl + " \n \n" 
     # TODO:  add some OS-INT lookups into the ticket
     # "Open Source Intel: \n" + intel + "\n"
 
