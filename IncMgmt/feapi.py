@@ -128,7 +128,7 @@ def ExtractFEAlerts(host, sys_type, data):
             # need to divide by 1000 and then convert fromtimestamp.
             # Finally, format the time in an easy-to-read way
             alerttime = dt.datetime.fromtimestamp(data["alert"][i]["occurred"] / 1000)
-            time = alerttime.strftime('%Y-5m-%d %H:%M:%s')
+            time = alerttime.strftime('%Y-%m-%d %H:%M:%s')
             return dst, hostname, malware, severity, activity, \
                 time, alertUrl  
         i += 1
