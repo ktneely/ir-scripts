@@ -46,7 +46,7 @@ sn_server = prefs[3].rstrip()
 user = prefs[4].rstrip()
 pwd = prefs[5].rstrip() 
 severity_filter = prefs[6].rstrip()
-if len(sys.argv) = 1:   # test for command line arguments
+if len(sys.argv) == 1:   # test for command line arguments
     ov_report = prefs[7].rstrip()
 else:
     ov_report = sys.argv[1]
