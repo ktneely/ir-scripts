@@ -3,15 +3,21 @@
 # This takes an XML report extracted from an OpenVAS VA scanner and
 # creates issue tickets on ServiceNow and Redmine systems for tracking
 # purposes.
+#
+# Most parameters are specified in the 'ov_prefs.txt' file, however,
+# the XML report file may be specified on the command line.  If
+# specified this way, the script will ignore that line in the
+# preferences file, however, the line must still exist!
 
-# version 0.2
+# version 0.5
 
 #modules
-import requests
-import socket
 import os
+import sys
 import csv
 import json
+import socket
+import requests
 from redmine import Redmine
 import xml.etree.ElementTree as ET
 
@@ -26,23 +32,26 @@ import xml.etree.ElementTree as ET
 # ServiceNow username
 # Servicenow password
 # severity level
-# OpenVAS XML report file
+# OpenVAS XML report file  
 # Preamble: general info you want included in every ticket created
 
 os.chdir(os.path.expanduser("~") + "/.incmgmt/")
-
-ov_prefs = open('ov_prefs.txt','r')
-redmine_project = ov_prefs.readline().rstrip()
-redmine_server = ov_prefs.readline().rstrip()
-redmine_key = ov_prefs.readline().rstrip()
-sn_server = ov_prefs.readline().rstrip()
-user = ov_prefs.readline().rstrip()
-pwd = ov_prefs.readline().rstrip()
-severity_filter = ov_prefs.readline().rstrip()
-ov_report = ov_prefs.readline().rstrip()
-preamble =  ov_prefs.readline().rstrip()
-ov_prefs.close()
-
+prefs = []
+for line in open('ov_prefs.txt'):
+    prefs.append(line)
+redmine_project = prefs[0].rstrip() 
+redmine_server = prefs[1].rstrip() 
+redmine_key = prefs[2].rstrip()
+sn_server = prefs[3].rstrip() 
+user = prefs[4].rstrip()
+pwd = prefs[5].rstrip() 
+severity_filter = prefs[6].rstrip()
+if len(sys.argv) = 1:   # test for command line arguments
+    ov_report = prefs[7].rstrip()
+else:
+    ov_report = sys.argv[1]
+preamble =  prefs[8].rstrip() 
+    
 # Define service now headers
 headers = {"Content-Type":"application/json","Accept":"application/json"}
 

@@ -11,8 +11,9 @@ import xml.etree.ElementTree as ET
 
 #data_dir = 'Directory where Data exists'
 data_dir = '/media/sf_Aruba/InfoSec/Metrics/Data/OpenVAS/External'
+# 
+months = ['2014-09', '2014-10', '2014-11', '2015-01', '2015-02', '2015-03']
 #severity_filter = 2 # filter the data; 0 = all
-months = ['2014-09', '2014-10', '2014-11', '2015-01', '2015-02']
 severities = {'All':0, 'Low':2, 'Medium':4, 'High':7 }
 # Read the reports
 os.chdir(data_dir)
