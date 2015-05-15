@@ -81,7 +81,9 @@ def timeRange(interval):
 # Determine if the issue is in the relevant interval and create a
 # service now ticket if it is
 def CheckInterval(created_filter, issue):
-    if issue.created_on - created_filter == abs(issue.created_on - \
+    issue_time = issue.created_on - dt.timedelta(hours=7) #adjust for UTC
+    
+    if issue_time - created_filter == abs(issue_time - \
                                             created_filter):
         print("issue " + str(issue.id) + " is in the interval")
         redmine_url = redmine_server + "/issues/" + str(issue.id)
