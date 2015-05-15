@@ -15,9 +15,11 @@ redmine_project = prefs[0].rstrip()
 redmine_server = prefs[1].rstrip() 
 redmine_key = prefs[2].rstrip()
 sn_server = prefs[3].rstrip() 
-user = prefs[4].rstrip()
-pwd = prefs[5].rstrip() 
+sn_user = prefs[4].rstrip()
+sn_pass = prefs[5].rstrip() 
 wikipage = "https://io.arubanetworks.com/projects/incident_management/wiki/Open_SSID_access_point"  # description of how to handle this issue
+
+requests.packages.urllib3.disable_warnings()  # turn off SSL warnings
 
 # Connect to redmine
 redmine = Redmine(redmine_server, requests={'verify': False}, \
@@ -81,6 +83,7 @@ def timeRange(interval):
 def CheckInterval(created_filter, issue):
     if issue.created_on - created_filter == abs(issue.created_on - \
                                             created_filter):
+        print("issue " + str(issue.id) + " is in the interval")
         redmine_url = redmine_server + "/issues/" + str(issue.id)
         subject = issue.subject
         sn_ticket, sys_id = sn_issue(subject, redmine_url, 2, 2, wikipage)
@@ -93,11 +96,11 @@ def CheckInterval(created_filter, issue):
 # Interval in minutes
 created_filter = timeRange(30)
 # Retrieve all newly-created tickets that relate to a Rogue SSID
-def RetrieveTickets():
-    for i in project.issues:
-        try:
-            if str(i.category).rstrip() == "Rogue SSID":
-                CheckInterval(created_filter, i) # check if new
-        except:
-            pass    # ignore errors
+for i in project.issues:
+    try:
+        if str(i.category).rstrip() == "Rogue SSID":
+            print("found matching ticket: " + str(i.id))
+            CheckInterval(created_filter, i) # check if new
+    except:
+        pass    # ignore errors
 
